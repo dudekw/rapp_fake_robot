@@ -7,7 +7,7 @@ import os
 import time
 from rapp_fake_robot.srv import Say, Record, RecognizeWord
 from os.path import expanduser
-import sounddevice as sd
+#import sounddevice as sd
 
 home = expanduser("~")
 sd.default.samplerate = 44100
@@ -29,8 +29,8 @@ def handle_record(req):
 	return file_name
 
 def fake_nao_comm():
-	sd.default.samplerate = 44100
-	sd.default.device = 'digital output'
+#	sd.default.samplerate = 44100
+#	sd.default.device = 'digital output'
 	rospy.init_node('fake_nao_comm')
 	s = rospy.Service('rapp_say', Say, handle_say)
 	s = rospy.Service('rapp_record', Record, handle_record)
