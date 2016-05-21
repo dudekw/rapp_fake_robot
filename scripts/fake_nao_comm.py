@@ -6,10 +6,15 @@ import urllib2
 import os
 import time
 from rapp_fake_robot.srv import Say, Record, RecognizeWord
+from os.path import expanduser
+import sounddevice as sd
 
-file_name="/home/max/workspaces/rapp/ls_mic_app/sound.ogg"
-path_to_script_say='./../workspaces/rapp/ls_mic_app/rapp-robot-nao/src/rapp_fake_robot/scripts/say.sh'
-path_to_script_record='./../workspaces/rapp/ls_mic_app/rapp-robot-nao/src/rapp_fake_robot/scripts/record.sh'
+home = expanduser("~")
+sd.default.samplerate = 44100
+sd.default.device = 'digital output'
+file_name=home+"/rapp/communication/data/sound.ogg"
+path_to_script_say=home+"/rapp/communication/src/rapp_fake_robot/scripts/say.sh"
+path_to_script_record=home+"/rapp/communication/src/rapp_fake_robot/scripts/record.sh"
 
 def handle_say(req):
 	print "NAO says in %s: %s" % (req.language, req.request)
@@ -18,10 +23,14 @@ def handle_say(req):
 
 def handle_record(req):
 	print "NAO records for %s seconds" % req.recordingTime
-	subprocess.check_call([path_to_script_record, str(req.recordingTime), file_name])
+
+	duration = 10  # seconds
+	myrecording = sd.rec(duration * fs, samplerate=fs, channels=2)
 	return file_name
 
 def fake_nao_comm():
+	sd.default.samplerate = 44100
+	sd.default.device = 'digital output'
 	rospy.init_node('fake_nao_comm')
 	s = rospy.Service('rapp_say', Say, handle_say)
 	s = rospy.Service('rapp_record', Record, handle_record)
